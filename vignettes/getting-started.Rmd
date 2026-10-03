@@ -1,0 +1,221 @@
+---
+title: "Getting Started with omie2fdata"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with omie2fdata}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", eval = FALSE)
+```
+
+# Overview
+
+`omie2fdata` follows a three-layer workflow:
+
+1. raw acquisition (`omie2txt()`, `omie2download()`),
+2. a common tabular representation (`omie2df()`),
+3. functional conversion (`omie2fdata()`, `omie2ldata()`).
+
+This design means that the same parser is used whether the raw OMIE file was
+saved previously or downloaded temporarily inside the conversion call.
+
+# Consolidated market-results source
+
+The original package workflow is retained as `source = "results"`.
+
+```{r}
+fd <- omie2fdata(
+  start_date = "2025-04-26",
+  end_date = "2025-04-30",
+  var_names = "price_es",
+  resolution = "hour"
+)
+plot(fd)
+```
+
+For several variables:
+
+```{r}
+ld <- omie2ldata(
+  start_date = "2025-04-26",
+  end_date = "2025-04-30",
+  var_names = c("price_es", "buy_es", "sell_es")
+)
+plot(ld$price_es)
+plot(ld$buy_es)
+```
+
+# Reusing previously downloaded files
+
+Raw files do not need to be downloaded again. A file, a vector of files, or a
+directory can be supplied directly. This is useful for archives created with an
+earlier version of `omie2fdata`.
+
+The package also contains a few small raw OMIE examples for tests and offline
+examples:
+
+```{r}
+f <- system.file("extdata", "omie_2025-04-01.txt", package = "omie2fdata")
+
+ld_local <- omie2ldata(
+  start_date = "2025-04-01",
+  end_date = "2025-04-01",
+  var_names = c("price_es", "buy_es"),
+  resolution = "hour",
+  file = f
+)
+
+plot(ld_local$price_es)
+plot(ld_local$buy_es)
+```
+
+# Direct repository source
+
+`omie2download()` downloads daily files from OMIE's public **Acceso a
+ficheros** repository. The first direct source integrated with functional
+conversion is `marginalpdbc`.
+
+```{r}
+paths <- omie2download(
+  file_type = "marginalpdbc",
+  start_date = "2026-07-01",
+  end_date = "2026-07-07",
+  output_dir = "data/marginalpdbc"
+)
+```
+
+These local files can then be converted directly:
+
+```{r}
+fd <- omie2fdata(
+  start_date = "2026-07-01",
+  end_date = "2026-07-07",
+  var_names = "price_es",
+  resolution = "15min",
+  source = "marginalpdbc",
+  file = "data/marginalpdbc"
+)
+plot(fd)
+```
+
+The package also bundles one unchanged `marginalpdbc` file, so the direct
+repository parser can be demonstrated without network access:
+
+```{r}
+f_marg <- system.file(
+  "extdata", "marginalpdbc_20260727.1", package = "omie2fdata"
+)
+
+ld_marg <- omie2ldata(
+  start_date = "2026-07-27",
+  end_date = "2026-07-27",
+  var_names = c("price_es", "price_pt"),
+  resolution = "15min",
+  source = "marginalpdbc",
+  file = f_marg
+)
+
+plot(ld_marg$price_es)
+plot(ld_marg$price_pt)
+```
+
+Files can also be downloaded temporarily in the same conversion call by
+leaving `file = NULL`.
+
+# Common `data.frame`
+
+`omie2df()` exposes the normalized intermediate representation. It contains one
+row per day and market period with `date`, `period`, `argval` and the requested
+variables. Daily metadata are stored in `attr(x, "metadata")`.
+
+```{r}
+x <- omie2df(
+  start_date = "2026-07-27",
+  end_date = "2026-07-27",
+  var_names = c("price_es", "price_pt"),
+  resolution = "15min",
+  source = "marginalpdbc"
+)
+head(x)
+attr(x, "metadata")
+```
+
+# A full year as functional data
+
+Daily price and market-energy profiles are a natural FDA representation. A
+closely related OMIE example was used by Febrero-Bande, González-Manteiga and
+Oviedo de la Fuente (2019), who analysed daily hourly profiles of market price
+and energy/demand in the Iberian electricity market.
+
+For example, a full year of hourly OMIE results can be downloaded once and
+reused locally:
+
+```{r}
+raw_2025 <- "data/omie_2025_hour"
+
+omie2txt(
+  start_date = "2025-01-01",
+  end_date = "2025-12-31",
+  resolution = "hour",
+  output_dir = raw_2025
+)
+
+omie2025 <- omie2ldata(
+  start_date = "2025-01-01",
+  end_date = "2025-12-31",
+  var_names = c("price_es", "buy_es"),
+  resolution = "hour",
+  input_dir = raw_2025
+)
+
+plot(omie2025$price_es)
+plot(omie2025$buy_es)
+```
+
+This produces one daily curve per market day. `buy_es` is OMIE's total purchase
+series for the Spanish system; it should not be labelled as physical system
+load or demand without qualification.
+
+The 28 April 2025 blackout can then be inspected directly from the same annual
+object, for example by locating the corresponding row in `omie2025$df` and
+plotting the selected daily curves.
+
+# Resolution and daylight saving time
+
+The default is hourly. Quarter-hourly data are accepted only from 2025-10-01.
+Daily curves are normalized to 24 or 96 points. Metadata retain
+`n_periods_raw`, `dst_adjusted`, `dst_type` and `aggregation` so this
+normalization is explicit.
+
+# Historical prices
+
+Legacy files with `Precio marginal (Cent/kWh)` are recognized and converted to
+`EUR/MWh`, allowing old OMEL/OMIE price curves to use the same unit as current
+prices.
+
+# OMIE data source and citation
+
+OMIE states in its legal notice that public and free information on its website
+may be used freely provided that its original content is respected, and that
+OMIE must be cited as the source when the information is used in its original
+format. The small files distributed in `inst/extdata` are therefore kept as raw
+examples, with provenance documented in `inst/extdata/README.md`.
+
+A suitable source citation is, for example:
+
+> OMI-Polo Español, S.A. (OMIE). *OMIE electricity-market public data*,
+> market-results or file-access dataset, https://www.omie.es/, accessed
+> [date].
+
+For a publication, cite both the `omie2fdata` package and the underlying OMIE
+data source. The package code is distributed under GPL-2; this does not replace
+OMIE's terms for the source market data.
+
+# Reference
+
+Febrero-Bande, M., González-Manteiga, W. and Oviedo de la Fuente, M. (2019).
+Variable selection in functional additive regression models. *Computational
+Statistics*, 34, 469-487. doi:10.1007/s00180-018-0844-5.

@@ -1,0 +1,23 @@
+OMIE DATA SOURCE AND REUSE NOTICE
+
+The R code in omie2fdata is distributed under the package license stated in
+DESCRIPTION. Public OMIE source data included as small examples in inst/extdata
+originate from OMI-Polo Español, S.A. (OMIE) and should be used in accordance
+with OMIE's own legal notice:
+
+  https://www.omie.es/es/aviso-legal
+
+OMIE states that information on its public website that is public and free of
+charge may be used freely provided that its original content is fully respected,
+and that the source must be cited when information from the OMIE website is used
+in its original format.
+
+Recommended source statement for raw OMIE files:
+
+  Source: OMI-Polo Español, S.A. (OMIE), public electricity-market data,
+  https://www.omie.es/.
+
+For data transformed by omie2fdata, cite OMIE as the original data source and
+also state the transformation performed by the package (for example unit
+normalization, DST normalization, or quarter-hour to hourly aggregation). OMIE
+is not responsible for transformations made by this package.

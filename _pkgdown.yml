@@ -1,0 +1,51 @@
+url: https://moviedo5.github.io/omie2fdata/
+
+template:
+  bootstrap: 5
+  bootswatch: flatly
+
+home:
+  title: omie2fdata
+  description: >
+    Download, read and convert public OMIE electricity-market data into
+    data.frame, fdata and ldata objects.
+
+navbar:
+  structure:
+    left: [home, reference, articles, news]
+    right: [github]
+
+components:
+  github:
+    icon: fa-github
+    href: https://github.com/moviedo5/omie2fdata
+    aria-label: GitHub repository
+
+reference:
+  - title: Data acquisition
+    contents:
+      - omie2txt
+      - omie2download
+
+  - title: Tabular data
+    contents:
+      - omie2df
+
+  - title: Functional data
+    contents:
+      - omie2fdata
+      - omie2ldata
+
+articles:
+  - title: Getting Started
+    contents:
+      - getting-started
+
+news:
+  - path: NEWS.md
+  - cran_dates: false
+
+development:
+  mode: auto
+
+author: "Manuel Oviedo <manuel.oviedo@udc.es>"

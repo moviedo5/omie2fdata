@@ -1,0 +1,29 @@
+Package: omie2fdata
+Type: Package
+Title: Download and Convert OMIE Market Data to Functional Data
+Version: 0.0.2
+Authors@R:
+    person(given = "Manuel",
+           family = "Oviedo de la Fuente",
+           role = c("aut", "cre"),
+           email = "manuel.oviedo@udc.es",
+           comment = c(ORCID = "0000-0001-7360-3249"))
+Description: Downloads and reads public electricity-market data from OMIE
+    (Operador del Mercado Iberico de Energia) and converts daily trajectories
+    into functional data objects ('fdata' and 'ldata') from the 'fda.usc'
+    package. It supports the consolidated day-ahead market-results files and
+    direct public-repository files such as 'marginalpdbc', local or temporary
+    downloads, hourly data, and quarter-hourly data from 1 October 2025.
+License: GPL-2
+Encoding: UTF-8
+Depends: R (>= 3.5.0)
+Imports: fda.usc, tools, utils
+Suggests: knitr, rmarkdown, testthat (>= 3.0.0)
+VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)
+Config/testthat/edition: 3
+URL: https://moviedo5.github.io/omie2fdata,
+    https://github.com/moviedo5/omie2fdata
+BugReports: https://github.com/moviedo5/omie2fdata/issues
+NeedsCompilation: no
+Config/roxygen2/version: 8.1.0

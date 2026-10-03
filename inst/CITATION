@@ -1,0 +1,14 @@
+citHeader("To cite omie2fdata in publications use:")
+
+bibentry(
+  bibtype = "Manual",
+  title = "omie2fdata: Download and Convert OMIE Market Data to Functional Data",
+  author = person("Manuel", "Oviedo de la Fuente"),
+  year = "2026",
+  note = "R package version 0.0.2",
+  url = "https://github.com/moviedo5/omie2fdata"
+)
+
+citFooter(
+  "Market data downloaded with omie2fdata should also cite OMI-Polo Español, S.A. (OMIE) and the specific OMIE market-results or file-access source used. See https://www.omie.es/es/aviso-legal."
+)
